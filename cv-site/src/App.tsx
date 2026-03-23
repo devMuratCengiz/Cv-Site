@@ -400,7 +400,7 @@ function AdminPage({
 }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false)
+  const [sessionEmail, setSessionEmail] = useState<string>('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authMessage, setAuthMessage] = useState('')
@@ -426,12 +426,12 @@ function AdminPage({
     }
 
     supabase.auth.getSession().then(({ data }) => {
-      setIsAdminAuthenticated(Boolean(data.session))
+      setSessionEmail(data.session?.user?.email ?? '')
       setLoading(false)
     })
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAdminAuthenticated(Boolean(session))
+      setSessionEmail(session?.user?.email ?? '')
       setLoading(false)
     })
 
@@ -464,25 +464,31 @@ function AdminPage({
 
   const handleAuth = async (event: React.FormEvent) => {
     event.preventDefault()
+    if (!supabase) return
 
     setAuthError('')
     setAuthMessage('')
 
-    if (email !== 'admin' || password !== 'adminmurat') {
-      setAuthError('Kullanıcı adı veya şifre hatalı.')
+    const result = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (result.error) {
+      setAuthError(result.error.message)
       return
     }
 
-    setIsAdminAuthenticated(true)
-    setAuthMessage('Admin girişi başarılı.')
+    setAuthMessage('Giriş başarılı.')
   }
 
+
   const handleSignOut = async () => {
-    setIsAdminAuthenticated(false)
-    setEmail('')
-    setPassword('')
+    if (!supabase) return
+    await supabase.auth.signOut()
     navigate('/admin')
   }
+
 
   const handleProfileSave = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -618,7 +624,7 @@ function AdminPage({
     )
   }
 
-  if (!isAdminAuthenticated) {
+  if (!sessionEmail) {
     return (
       <div className="page adminWrap">
         <div className="adminShell authShell">
@@ -626,18 +632,18 @@ function AdminPage({
             <p className="sectionLabel">Admin</p>
             <h1>Yönetim paneli</h1>
             <p className="adminIntro">
-              Projelerini ve profil bilgilerini yönetmek için admin girişi yap.
+              Projelerini ve profil bilgilerini yönetmek için giriş yap.
             </p>
           </div>
 
           <form className="adminCard authCard" onSubmit={handleAuth}>
             <label className="fieldGroup">
-              <span>Kullanıcı adı</span>
+              <span>E-posta</span>
               <input
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                type="text"
-                placeholder="admin"
+                type="email"
+                placeholder="mail@example.com"
                 required
               />
             </label>
@@ -648,7 +654,7 @@ function AdminPage({
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 type="password"
-                placeholder="adminmurat"
+                placeholder="Şifren"
                 required
               />
             </label>
@@ -672,7 +678,7 @@ function AdminPage({
           <div>
             <p className="sectionLabel">Admin</p>
             <h1>İçerik yönetimi</h1>
-            <p className="adminIntro">Giriş yapan hesap: admin</p>
+            <p className="adminIntro">Giriş yapan hesap: {sessionEmail}</p>
           </div>
           <div className="adminActionsTop">
             <Link className="secondaryBtn" to="/">
