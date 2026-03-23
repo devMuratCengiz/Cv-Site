@@ -51,7 +51,7 @@ const projects: Project[] = [
 function App() {
   return (
     <div className="page">
-      <header className="hero">
+      <header className="hero reveal reveal-delay-1">
         <nav className="nav">
           <div className="brand">Murat</div>
           <div className="navLinks">
@@ -62,7 +62,7 @@ function App() {
         </nav>
 
         <div className="heroContent">
-          <div className="heroText">
+          <div className="heroText reveal reveal-delay-2">
             <p className="eyebrow">CV / Portfolio</p>
             <h1>Murat için modern bir kişisel site</h1>
             <p className="lead">
@@ -80,7 +80,7 @@ function App() {
             </div>
           </div>
 
-          <div className="heroCard">
+          <div className="heroCard reveal reveal-delay-3">
             <span className="badge">Açık Profil</span>
             <h2>Kısa Özet</h2>
             <p>
@@ -97,7 +97,7 @@ function App() {
       </header>
 
       <main>
-        <section id="about" className="section twoColumn">
+        <section id="about" className="section twoColumn reveal reveal-delay-1 section-anchor">
           <div>
             <p className="sectionLabel">Hakkımda</p>
             <h2>Kendimi tanıtabileceğim alan</h2>
@@ -114,26 +114,26 @@ function App() {
           </div>
         </section>
 
-        <section className="section statsGrid">
-          <div className="statCard">
+        <section className="section statsGrid reveal reveal-delay-2">
+          <div className="statCard floatCard">
             <strong>3+</strong>
             <span>Öne çıkarılmış proje</span>
           </div>
-          <div className="statCard">
+          <div className="statCard floatCard">
             <strong>Web</strong>
             <span>Modern frontend yaklaşımı</span>
           </div>
-          <div className="statCard">
+          <div className="statCard floatCard">
             <strong>Mobil</strong>
             <span>React Native denemeleri</span>
           </div>
-          <div className="statCard">
+          <div className="statCard floatCard">
             <strong>Canlı</strong>
             <span>Kolayca güncellenebilir yapı</span>
           </div>
         </section>
 
-        <section id="projects" className="section">
+        <section id="projects" className="section reveal reveal-delay-3 section-anchor">
           <div className="sectionHeader">
             <div>
               <p className="sectionLabel">Projeler</p>
@@ -145,8 +145,12 @@ function App() {
           </div>
 
           <div className="projectsGrid">
-            {projects.map((project) => (
-              <article className="projectCard" key={project.title}>
+            {projects.map((project, index) => (
+              <article
+                className="projectCard reveal projectReveal"
+                style={{ animationDelay: `${0.15 * (index + 1)}s` }}
+                key={project.title}
+              >
                 <div className="projectTop">
                   <span className="year">{project.year}</span>
                   <h3>{project.title}</h3>
@@ -179,7 +183,7 @@ function App() {
           </div>
         </section>
 
-        <section id="contact" className="section contactSection">
+        <section id="contact" className="section contactSection reveal reveal-delay-4 section-anchor">
           <div>
             <p className="sectionLabel">İletişim</p>
             <h2>Senin bilgilerinle doldurulacak son bölüm</h2>
