@@ -1,1 +1,4 @@
 cv-site/.env
+.env
+node_modules
+dist
