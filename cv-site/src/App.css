@@ -326,6 +326,27 @@ main {
   font-weight: 700;
 }
 
+.dataBadge {
+  margin-top: 16px;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.loadingScreen {
+  display: grid;
+  place-items: center;
+  padding: 40px 24px;
+}
+
+.loadingCard {
+  max-width: 720px;
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 24px;
+  padding: 28px;
+}
+
 .detailPageWrap {
   padding: 40px 24px 80px;
 }

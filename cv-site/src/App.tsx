@@ -1,80 +1,19 @@
+import { useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Link, Route, Routes, useParams } from 'react-router-dom'
 import './App.css'
+import {
+  fallbackProfile,
+  fallbackProjects,
+  type Profile,
+  type Project,
+} from './data/fallback'
+import { hasSupabaseEnv, supabase } from './lib/supabase'
 
-type Project = {
-  slug: string
-  title: string
-  year: string
-  shortDescription: string
-  description: string
-  stack: string[]
-  highlights: string[]
-  github?: string
-  images: string[]
+type SiteData = {
+  profile: Profile
+  projects: Project[]
+  source: 'fallback' | 'supabase'
 }
-
-const projects: Project[] = [
-  {
-    slug: 'todo-app',
-    title: 'To-Do App',
-    year: '2026',
-    shortDescription:
-      'React Native ile geliştirilmiş, sade tasarımlı bir görev takip uygulaması.',
-    description:
-      'Bu proje, günlük görevleri hızlıca eklemek, filtrelemek ve tamamlanan işleri düzenli biçimde yönetmek için geliştirildi. Mobil öncelikli düşünülmüş sade bir arayüz ve pratik kullanıcı deneyimi hedeflenmiştir.',
-    stack: ['React Native', 'Expo', 'TypeScript'],
-    highlights: [
-      'Görev ekleme, silme ve tamamlama akışı',
-      'Aktif / tamamlanan görev filtreleri',
-      'Mobil öncelikli sade arayüz',
-    ],
-    github: 'https://github.com/username/todo-app',
-    images: [
-      'https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
-    ],
-  },
-  {
-    slug: 'cv-portfolio-website',
-    title: 'CV / Portfolio Website',
-    year: '2026',
-    shortDescription:
-      'Kişisel bilgileri ve projeleri profesyonel şekilde sunan modern web sitesi.',
-    description:
-      'Bu site; hakkımda bilgileri, yetenekleri ve geliştirdiğim projeleri düzenli ve modern bir arayüzle göstermek için hazırlandı. Sade görünüm, okunabilirlik ve ileride genişletilebilir yapı ön planda tutuldu.',
-    stack: ['React', 'Vite', 'TypeScript', 'CSS'],
-    highlights: [
-      'Responsive modern arayüz',
-      'Animasyonlu section geçişleri',
-      'Detay sayfasına giden proje kartları',
-    ],
-    github: 'https://github.com/username/cv-site',
-    images: [
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1200&q=80',
-    ],
-  },
-  {
-    slug: 'gelecek-proje',
-    title: 'Eklenecek Proje',
-    year: 'Yakında',
-    shortDescription:
-      'Gerçek projelerinden biri için hazır bekleyen detaylı sunum alanı.',
-    description:
-      'Bu alan, ileride ekleyeceğin gerçek bir projeyi profesyonel şekilde sunmak için hazırlandı. Problemi, çözümü, teknik mimarisi, kullanılan araçlar ve elde edilen sonuçlar burada anlatılabilir.',
-    stack: ['Next.js', 'Node.js', 'PostgreSQL'],
-    highlights: [
-      'Problemi ne çözdüğü',
-      'Teknik mimari anlatımı',
-      'Sonuç ve çıktıların özetlenmesi',
-    ],
-    github: 'https://github.com/username/new-project',
-    images: [
-      'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
-    ],
-  },
-]
 
 function Navbar() {
   return (
@@ -91,7 +30,65 @@ function Navbar() {
   )
 }
 
-function HomePage() {
+async function loadSiteData(): Promise<SiteData> {
+  if (!supabase || !hasSupabaseEnv) {
+    return {
+      profile: fallbackProfile,
+      projects: fallbackProjects,
+      source: 'fallback',
+    }
+  }
+
+  const [{ data: profileData, error: profileError }, { data: projectRows, error: projectError }] =
+    await Promise.all([
+      supabase.from('profile').select('*').limit(1).maybeSingle(),
+      supabase.from('projects').select('*').order('created_at', { ascending: false }),
+    ])
+
+  if (profileError || projectError) {
+    console.error('Supabase fetch failed, fallback kullanılacak:', {
+      profileError,
+      projectError,
+    })
+
+    return {
+      profile: fallbackProfile,
+      projects: fallbackProjects,
+      source: 'fallback',
+    }
+  }
+
+  const projects: Project[] = (projectRows ?? []).map((row) => ({
+    slug: row.slug,
+    title: row.title,
+    year: row.year,
+    shortDescription: row.short_description,
+    description: row.description,
+    stack: row.stack ?? [],
+    highlights: row.highlights ?? [],
+    github: row.github ?? undefined,
+    images: row.images ?? [],
+  }))
+
+  const profile: Profile = profileData
+    ? {
+        name: profileData.name,
+        heroTitle: profileData.hero_title,
+        heroDescription: profileData.hero_description,
+        summary: profileData.summary,
+        about: profileData.about ?? [],
+        contactEmail: profileData.contact_email,
+      }
+    : fallbackProfile
+
+  return {
+    profile,
+    projects: projects.length > 0 ? projects : fallbackProjects,
+    source: 'supabase',
+  }
+}
+
+function HomePage({ profile, projects, source }: { profile: Profile; projects: Project[]; source: SiteData['source'] }) {
   return (
     <div className="page">
       <header className="hero reveal reveal-delay-1">
@@ -100,12 +97,8 @@ function HomePage() {
         <div className="heroContent">
           <div className="heroText reveal reveal-delay-2">
             <p className="eyebrow">CV / Portfolio</p>
-            <h1>Murat için modern bir kişisel site</h1>
-            <p className="lead">
-              Yazılım öğrenen, üreten ve geliştirdiklerini düzenli biçimde sunmak
-              isteyen biri olarak; burada kendimden bahsedebilir, yeteneklerimi
-              paylaşabilir ve projelerimi detaylarıyla gösterebilirim.
-            </p>
+            <h1>{profile.heroTitle}</h1>
+            <p className="lead">{profile.heroDescription}</p>
             <div className="heroActions">
               <a className="primaryBtn" href="#projects">
                 Projeleri Gör
@@ -114,15 +107,15 @@ function HomePage() {
                 İletişim
               </a>
             </div>
+            <p className="dataBadge">
+              Veri kaynağı: {source === 'supabase' ? 'Supabase' : 'Yerel örnek veri'}
+            </p>
           </div>
 
           <div className="heroCard reveal reveal-delay-3">
             <span className="badge">Açık Profil</span>
             <h2>Kısa Özet</h2>
-            <p>
-              React, mobil uygulamalar ve modern web teknolojileriyle ilgileniyorum.
-              Öğrendiklerimi gerçek projelere dönüştürmeyi seviyorum.
-            </p>
+            <p>{profile.summary}</p>
             <ul>
               <li>Frontend odaklı geliştirme</li>
               <li>Mobil uygulama denemeleri</li>
@@ -139,20 +132,15 @@ function HomePage() {
             <h2>Kendimi tanıtabileceğim alan</h2>
           </div>
           <div className="textBlock">
-            <p>
-              Bu bölümde eğitim geçmişini, ilgi alanlarını, hangi teknolojilere
-              odaklandığını ve nasıl bir geliştirici olmak istediğini anlatabiliriz.
-            </p>
-            <p>
-              İstersen bunu sade bir dille, istersen daha profesyonel İngilizce/Türkçe
-              CV tonu ile yeniden yazabilirim.
-            </p>
+            {profile.about.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
         </section>
 
         <section className="section statsGrid reveal reveal-delay-2">
           <div className="statCard floatCard">
-            <strong>3+</strong>
+            <strong>{projects.length}+</strong>
             <span>Öne çıkarılmış proje</span>
           </div>
           <div className="statCard floatCard">
@@ -176,7 +164,7 @@ function HomePage() {
               <h2>Geliştirdiğim işleri detaylı gösterebildiğim alan</h2>
             </div>
             <p className="sectionHint">
-              Buradaki tüm içerikleri senin gerçek projelerine göre doldurabiliriz.
+              Supabase bağlanınca bu listeyi panel/veritabanı üzerinden dinamik besleyebiliriz.
             </p>
           </div>
 
@@ -225,7 +213,7 @@ function HomePage() {
               Buraya e-posta, GitHub, LinkedIn, X/Twitter veya kişisel iletişim
               kanallarını ekleyebiliriz.
             </p>
-            <p className="contactMail">ornekmail@example.com</p>
+            <p className="contactMail">{profile.contactEmail}</p>
           </div>
         </section>
       </main>
@@ -233,9 +221,9 @@ function HomePage() {
   )
 }
 
-function ProjectDetailPage() {
+function ProjectDetailPage({ projects }: { projects: Project[] }) {
   const { slug } = useParams()
-  const project = projects.find((item) => item.slug === slug)
+  const project = useMemo(() => projects.find((item) => item.slug === slug), [projects, slug])
 
   if (!project) {
     return (
@@ -320,11 +308,44 @@ function ProjectDetailPage() {
 }
 
 function App() {
+  const [siteData, setSiteData] = useState<SiteData>({
+    profile: fallbackProfile,
+    projects: fallbackProjects,
+    source: 'fallback',
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadSiteData()
+      .then((data) => setSiteData(data))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="page loadingScreen">
+        <div className="loadingCard">
+          <span className="badge">Yükleniyor</span>
+          <h1>Site verileri hazırlanıyor...</h1>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+        <Route
+          path="/"
+          element={
+            <HomePage
+              profile={siteData.profile}
+              projects={siteData.projects}
+              source={siteData.source}
+            />
+          }
+        />
+        <Route path="/projects/:slug" element={<ProjectDetailPage projects={siteData.projects} />} />
       </Routes>
     </BrowserRouter>
   )
