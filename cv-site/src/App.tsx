@@ -400,8 +400,7 @@ function AdminPage({
 }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [sessionEmail, setSessionEmail] = useState<string>('')
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authMessage, setAuthMessage] = useState('')
@@ -427,12 +426,12 @@ function AdminPage({
     }
 
     supabase.auth.getSession().then(({ data }) => {
-      setSessionEmail(data.session?.user?.email ?? '')
+      setIsAdminAuthenticated(Boolean(data.session))
       setLoading(false)
     })
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSessionEmail(session?.user?.email ?? '')
+      setIsAdminAuthenticated(Boolean(session))
       setLoading(false)
     })
 
@@ -465,31 +464,23 @@ function AdminPage({
 
   const handleAuth = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!supabase) return
 
     setAuthError('')
     setAuthMessage('')
 
-    const result =
-      authMode === 'signin'
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password })
-
-    if (result.error) {
-      setAuthError(result.error.message)
+    if (email !== 'admin' || password !== 'adminmurat') {
+      setAuthError('Kullanıcı adı veya şifre hatalı.')
       return
     }
 
-    setAuthMessage(
-      authMode === 'signin'
-        ? 'Giriş başarılı.'
-        : 'Kayıt oluşturuldu. E-posta doğrulama açıksa mailini kontrol et.',
-    )
+    setIsAdminAuthenticated(true)
+    setAuthMessage('Admin girişi başarılı.')
   }
 
   const handleSignOut = async () => {
-    if (!supabase) return
-    await supabase.auth.signOut()
+    setIsAdminAuthenticated(false)
+    setEmail('')
+    setPassword('')
     navigate('/admin')
   }
 
@@ -627,7 +618,7 @@ function AdminPage({
     )
   }
 
-  if (!sessionEmail) {
+  if (!isAdminAuthenticated) {
     return (
       <div className="page adminWrap">
         <div className="adminShell authShell">
@@ -635,35 +626,18 @@ function AdminPage({
             <p className="sectionLabel">Admin</p>
             <h1>Yönetim paneli</h1>
             <p className="adminIntro">
-              Projelerini ve profil bilgilerini yönetmek için giriş yap.
+              Projelerini ve profil bilgilerini yönetmek için admin girişi yap.
             </p>
           </div>
 
           <form className="adminCard authCard" onSubmit={handleAuth}>
-            <div className="authModeRow">
-              <button
-                type="button"
-                className={`modeButton ${authMode === 'signin' ? 'modeButtonActive' : ''}`}
-                onClick={() => setAuthMode('signin')}
-              >
-                Giriş Yap
-              </button>
-              <button
-                type="button"
-                className={`modeButton ${authMode === 'signup' ? 'modeButtonActive' : ''}`}
-                onClick={() => setAuthMode('signup')}
-              >
-                Kayıt Ol
-              </button>
-            </div>
-
             <label className="fieldGroup">
-              <span>E-posta</span>
+              <span>Kullanıcı adı</span>
               <input
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                type="email"
-                placeholder="mail@example.com"
+                type="text"
+                placeholder="admin"
                 required
               />
             </label>
@@ -674,7 +648,7 @@ function AdminPage({
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 type="password"
-                placeholder="En az 6 karakter"
+                placeholder="adminmurat"
                 required
               />
             </label>
@@ -683,7 +657,7 @@ function AdminPage({
             {authMessage ? <p className="successText">{authMessage}</p> : null}
 
             <button className="primaryBtn fullWidthButton" type="submit">
-              {authMode === 'signin' ? 'Giriş Yap' : 'Kayıt Oluştur'}
+              Giriş Yap
             </button>
           </form>
         </div>
@@ -698,7 +672,7 @@ function AdminPage({
           <div>
             <p className="sectionLabel">Admin</p>
             <h1>İçerik yönetimi</h1>
-            <p className="adminIntro">Giriş yapan hesap: {sessionEmail}</p>
+            <p className="adminIntro">Giriş yapan hesap: admin</p>
           </div>
           <div className="adminActionsTop">
             <Link className="secondaryBtn" to="/">
