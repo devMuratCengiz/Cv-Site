@@ -473,6 +473,153 @@ main {
   }
 }
 
+.adminWrap {
+  padding: 40px 24px 80px;
+}
+
+.adminShell {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.adminHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.adminActionsTop {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adminIntro {
+  color: #9fb2cb;
+  line-height: 1.8;
+}
+
+.adminGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+}
+
+.adminCard,
+.authCard {
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.adminCardHeader h2 {
+  margin: 0 0 10px;
+}
+
+.adminCardHeader p {
+  color: #9fb2cb;
+  margin: 0 0 18px;
+}
+
+.authShell {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: 24px;
+  align-items: start;
+}
+
+.authModeRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.modeButton,
+.buttonReset,
+.dangerButton {
+  border: none;
+  cursor: pointer;
+}
+
+.modeButton {
+  background: #111827;
+  color: #cbd5e1;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.modeButtonActive {
+  background: rgba(56, 189, 248, 0.12);
+  color: #e0f2fe;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.fieldGroup span {
+  color: #dbeafe;
+  font-weight: 600;
+}
+
+.fieldGroup input,
+.fieldGroup textarea,
+.projectPickerRow select {
+  width: 100%;
+  background: #0b1220;
+  color: #f8fbff;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.fieldGroup textarea {
+  resize: vertical;
+}
+
+.fullWidthButton {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+}
+
+.errorText {
+  color: #fda4af;
+  margin: 8px 0 14px;
+}
+
+.successText {
+  color: #86efac;
+  margin: 8px 0 14px;
+}
+
+.projectPickerRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.dangerButton {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.adminForm {
+  margin-top: 8px;
+}
+
 @media (max-width: 900px) {
   .heroContent,
   .twoColumn,
@@ -482,17 +629,21 @@ main {
   .projectsGrid,
   .galleryGrid,
   .detailGrid,
-  .detailHero {
+  .detailHero,
+  .adminGrid,
+  .authShell {
     grid-template-columns: 1fr;
   }
 
-  .nav {
+  .nav,
+  .adminHeader {
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 40px;
   }
 
-  .detailTopbar {
+  .detailTopbar,
+  .projectPickerRow {
     flex-direction: column;
     align-items: flex-start;
   }
