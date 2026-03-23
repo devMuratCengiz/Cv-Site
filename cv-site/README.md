@@ -1,73 +1,124 @@
-# React + TypeScript + Vite
+# CV Site
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern, dinamik bir kişisel CV / portfolio sitesi.
 
-Currently, two official plugins are available:
+Bu proje; kendini tanıtmak, projelerini detaylı şekilde sergilemek ve içerikleri admin panel üzerinden yönetebilmek için geliştirildi.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Özellikler
 
-## React Compiler
+- Modern ve sade arayüz
+- Responsive tasarım
+- Yumuşak scroll ve giriş animasyonları
+- Proje kartları ve detay sayfaları
+- Supabase ile dinamik veri yapısı
+- Admin panel üzerinden:
+  - profil güncelleme
+  - proje ekleme
+  - proje düzenleme
+  - proje silme
+- Vercel'e deploy edilebilir yapı
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Kullanılan Teknolojiler
 
-## Expanding the ESLint configuration
+- React
+- TypeScript
+- Vite
+- React Router DOM
+- Supabase
+- CSS
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Sayfalar
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Ana Sayfa
+- Hero alanı
+- Hakkımda bölümü
+- Projeler bölümü
+- İletişim bölümü
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Proje Detay Sayfası
+Her proje için ayrı detay sayfası bulunur. Bu sayfada:
+- proje adı
+- kısa açıklama
+- detaylı açıklama
+- kullanılan teknolojiler
+- ekran görüntüleri
+- GitHub linki
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Admin Panel
+`/admin` rotasında bulunur.
+
+Admin panel ile:
+- profil içerikleri güncellenebilir
+- yeni proje eklenebilir
+- mevcut projeler düzenlenebilir
+- projeler silinebilir
+
+## Geliştirme Ortamı
+
+Projeyi lokal çalıştırmak için:
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Tarayıcıda aç:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+http://localhost:4173
 ```
+
+## Environment Variables
+
+`.env` dosyası oluştur:
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Örnek dosya:
+
+- `.env.example`
+
+## Supabase Kurulumu
+
+Proje Supabase ile çalışacak şekilde hazırlanmıştır.
+
+Gerekli SQL dosyaları:
+
+- `supabase-schema.sql` → tablolar ve örnek veriler
+- `supabase-admin-policies.sql` → admin panel için gerekli policy ayarları
+
+## Build
+
+Production build almak için:
+
+```bash
+npm run build
+```
+
+## Deploy
+
+Bu proje Vercel üzerinde kolayca yayınlanabilir.
+
+Önerilen yapı:
+- frontend: Vercel
+- backend/data: Supabase
+
+## Not
+
+Bu proje başlangıçta kişisel portfolio / CV sitesi olarak tasarlanmıştır ama kolayca geliştirilebilir.
+
+İleride eklenebilecek şeyler:
+- özel domain
+- proje görsel upload
+- canlı demo linkleri
+- dark/light mode geliştirmeleri
+- daha gelişmiş admin yetkilendirme
+
+## Repository
+
+GitHub:
+
+- https://github.com/devMuratCengiz/Cv-Site
