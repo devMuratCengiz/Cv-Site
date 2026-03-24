@@ -3,6 +3,28 @@
   color: #e5eefc;
 }
 
+.hero-enter {
+  opacity: 0;
+  transform: translate3d(0, 42px, 0) scale(0.985);
+  will-change: opacity, transform;
+}
+
+.page-mounted .hero-enter {
+  animation: heroEnter 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-enter-1 {
+  animation-delay: 0.05s;
+}
+
+.hero-enter-2 {
+  animation-delay: 0.18s;
+}
+
+.hero-enter-3 {
+  animation-delay: 0.32s;
+}
+
 .hero {
   padding: 28px 24px 56px;
   background:
@@ -450,6 +472,17 @@ main {
   animation-delay: 0.38s;
 }
 
+@keyframes heroEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 42px, 0) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @keyframes revealUp {
   0% {
     opacity: 0;
@@ -486,6 +519,8 @@ main {
     scroll-behavior: auto;
   }
 
+  .hero-enter,
+  .page-mounted .hero-enter,
   .reveal,
   .projectReveal,
   .reveal.revealed,

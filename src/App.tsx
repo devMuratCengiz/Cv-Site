@@ -212,14 +212,20 @@ function HomePage({
   source: SiteData['source']
 }) {
   const revealRef = useRevealOnView()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setMounted(true), 60)
+    return () => window.clearTimeout(id)
+  }, [])
 
   return (
-    <div className="page" ref={revealRef}>
-      <header className="hero reveal reveal-delay-1 revealed" data-reveal>
+    <div className={`page ${mounted ? 'page-mounted' : ''}`} ref={revealRef}>
+      <header className="hero hero-enter hero-enter-1">
         <Navbar />
 
         <div className="heroContent">
-          <div className="heroText reveal reveal-delay-2 revealed" data-reveal>
+          <div className="heroText hero-enter hero-enter-2">
             <p className="eyebrow">CV / Portfolio</p>
             <h1>{profile.heroTitle}</h1>
             <p className="lead">{profile.heroDescription}</p>
@@ -236,7 +242,7 @@ function HomePage({
             </p>
           </div>
 
-          <div className="heroCard reveal reveal-delay-3 revealed" data-reveal>
+          <div className="heroCard hero-enter hero-enter-3">
             <span className="badge">Açık Profil</span>
             <h2>Kısa Özet</h2>
             <p>{profile.summary}</p>
