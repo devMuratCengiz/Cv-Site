@@ -347,14 +347,6 @@ main {
   padding: 28px;
 }
 
-.loadingCardCompact {
-  max-width: 220px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
 .loadingSpinner {
   width: 52px;
   height: 52px;
@@ -365,10 +357,10 @@ main {
   animation: spin 0.9s linear infinite;
 }
 
-.loadingLabel {
-  color: #dbeafe;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+.loadingSpinnerLarge {
+  width: 72px;
+  height: 72px;
+  border-width: 5px;
 }
 
 .detailPageWrap {
@@ -422,18 +414,24 @@ main {
 
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 28px, 0);
+  transform: translate3d(0, 36px, 0);
   will-change: opacity, transform;
   backface-visibility: hidden;
+}
+
+.reveal.revealed {
   animation: revealUp 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .projectReveal {
   opacity: 0;
-  transform: translate3d(0, 36px, 0) scale(0.985);
+  transform: translate3d(0, 44px, 0) scale(0.975);
   will-change: opacity, transform;
   backface-visibility: hidden;
-  animation: revealUpSoft 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.projectReveal.revealed {
+  animation: revealUpSoft 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .reveal-delay-1 {
@@ -489,7 +487,9 @@ main {
   }
 
   .reveal,
-  .projectReveal {
+  .projectReveal,
+  .reveal.revealed,
+  .projectReveal.revealed {
     opacity: 1;
     transform: none;
     animation: none;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   BrowserRouter,
   Link,
@@ -20,6 +20,39 @@ type SiteData = {
   profile: Profile
   projects: Project[]
   source: 'fallback' | 'supabase'
+}
+
+function useRevealOnView() {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const elements = Array.from(container.querySelectorAll<HTMLElement>('[data-reveal]'))
+    if (elements.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      {
+        threshold: 0.18,
+        rootMargin: '0px 0px -40px 0px',
+      },
+    )
+
+    elements.forEach((element) => observer.observe(element))
+
+    return () => observer.disconnect()
+  }, [])
+
+  return containerRef
 }
 
 type ProjectForm = {
@@ -178,13 +211,15 @@ function HomePage({
   projects: Project[]
   source: SiteData['source']
 }) {
+  const revealRef = useRevealOnView()
+
   return (
-    <div className="page">
-      <header className="hero reveal reveal-delay-1">
+    <div className="page" ref={revealRef}>
+      <header className="hero reveal reveal-delay-1 revealed" data-reveal>
         <Navbar />
 
         <div className="heroContent">
-          <div className="heroText reveal reveal-delay-2">
+          <div className="heroText reveal reveal-delay-2 revealed" data-reveal>
             <p className="eyebrow">CV / Portfolio</p>
             <h1>{profile.heroTitle}</h1>
             <p className="lead">{profile.heroDescription}</p>
@@ -201,7 +236,7 @@ function HomePage({
             </p>
           </div>
 
-          <div className="heroCard reveal reveal-delay-3">
+          <div className="heroCard reveal reveal-delay-3 revealed" data-reveal>
             <span className="badge">Açık Profil</span>
             <h2>Kısa Özet</h2>
             <p>{profile.summary}</p>
@@ -218,6 +253,7 @@ function HomePage({
         <section
           id="about"
           className="section twoColumn reveal reveal-delay-1 section-anchor"
+          data-reveal
         >
           <div>
             <p className="sectionLabel">Hakkımda</p>
@@ -230,7 +266,7 @@ function HomePage({
           </div>
         </section>
 
-        <section className="section statsGrid reveal reveal-delay-2">
+        <section className="section statsGrid reveal reveal-delay-2" data-reveal>
           <div className="statCard floatCard">
             <strong>{projects.length}+</strong>
             <span>Öne çıkarılmış proje</span>
@@ -252,6 +288,7 @@ function HomePage({
         <section
           id="projects"
           className="section reveal reveal-delay-3 section-anchor"
+          data-reveal
         >
           <div className="sectionHeader">
             <div>
@@ -268,6 +305,7 @@ function HomePage({
             {projects.map((project, index) => (
               <article
                 className="projectCard reveal projectReveal"
+                data-reveal
                 style={{ animationDelay: `${0.15 * (index + 1)}s` }}
                 key={project.slug}
               >
@@ -302,6 +340,7 @@ function HomePage({
         <section
           id="contact"
           className="section contactSection reveal reveal-delay-4 section-anchor"
+          data-reveal
         >
           <div>
             <p className="sectionLabel">İletişim</p>
@@ -986,11 +1025,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="page loadingScreen">
-        <div className="loadingCard loadingCardCompact" aria-label="Yükleniyor">
-          <div className="loadingSpinner" />
-          <span className="loadingLabel">Yükleniyor</span>
-        </div>
+      <div className="page loadingScreen" aria-label="Yükleniyor">
+        <div className="loadingSpinner loadingSpinnerLarge" />
       </div>
     )
   }
