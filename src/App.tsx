@@ -70,15 +70,41 @@ function createProjectForm(project?: Project): ProjectForm {
 }
 
 function Navbar() {
+  const handleNavScroll = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    targetId: string,
+  ) => {
+    event.preventDefault()
+
+    const target = document.getElementById(targetId)
+    if (!target) return
+
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+
+    window.history.replaceState(null, '', `#${targetId}`)
+  }
+
   return (
     <nav className="nav">
       <Link className="brand" to="/">
         Murat
       </Link>
       <div className="navLinks">
-        <a href="#about">Hakkımda</a>
-        <a href="#projects">Projeler</a>
-        <a href="#contact">İletişim</a>
+        <a href="#about" onClick={(event) => handleNavScroll(event, 'about')}>
+          Hakkımda
+        </a>
+        <a
+          href="#projects"
+          onClick={(event) => handleNavScroll(event, 'projects')}
+        >
+          Projeler
+        </a>
+        <a href="#contact" onClick={(event) => handleNavScroll(event, 'contact')}>
+          İletişim
+        </a>
         <Link to="/admin">Admin</Link>
       </div>
     </nav>
@@ -961,9 +987,9 @@ function App() {
   if (loading) {
     return (
       <div className="page loadingScreen">
-        <div className="loadingCard">
-          <span className="badge">Yükleniyor</span>
-          <h1>Site verileri hazırlanıyor...</h1>
+        <div className="loadingCard loadingCardCompact" aria-label="Yükleniyor">
+          <div className="loadingSpinner" />
+          <span className="loadingLabel">Yükleniyor</span>
         </div>
       </div>
     )
