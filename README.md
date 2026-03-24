@@ -119,6 +119,4 @@ Bu proje başlangıçta kişisel portfolio / CV sitesi olarak tasarlanmıştır 
 
 ## Repository
 
-GitHub:
 
-- https://github.com/devMuratCengiz/Cv-Site
