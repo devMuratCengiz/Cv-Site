@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
 import {
   BrowserRouter,
   Link,
@@ -22,37 +23,18 @@ type SiteData = {
   source: 'fallback' | 'supabase'
 }
 
-function useRevealOnView() {
-  const containerRef = useRef<HTMLDivElement | null>(null)
+const heroMotion = {
+  initial: { opacity: 0, y: 36, scale: 0.985 },
+  whileInView: { opacity: 1, y: 0, scale: 1 },
+  viewport: { once: true, amount: 0.3 },
+  transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
+}
 
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const elements = Array.from(container.querySelectorAll<HTMLElement>('[data-reveal]'))
-    if (elements.length === 0) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed')
-            observer.unobserve(entry.target)
-          }
-        })
-      },
-      {
-        threshold: 0.18,
-        rootMargin: '0px 0px -40px 0px',
-      },
-    )
-
-    elements.forEach((element) => observer.observe(element))
-
-    return () => observer.disconnect()
-  }, [])
-
-  return containerRef
+const sectionMotion = {
+  initial: { opacity: 0, y: 32 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] as const },
 }
 
 type ProjectForm = {
@@ -211,21 +193,13 @@ function HomePage({
   projects: Project[]
   source: SiteData['source']
 }) {
-  const revealRef = useRevealOnView()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    const id = window.setTimeout(() => setMounted(true), 60)
-    return () => window.clearTimeout(id)
-  }, [])
-
   return (
-    <div className={`page ${mounted ? 'page-mounted' : ''}`} ref={revealRef}>
-      <header className="hero hero-enter hero-enter-1">
+    <div className="page">
+      <motion.header className="hero" {...heroMotion}>
         <Navbar />
 
         <div className="heroContent">
-          <div className="heroText hero-enter hero-enter-2">
+          <motion.div className="heroText" {...heroMotion} transition={{ ...heroMotion.transition, delay: 0.12 }}>
             <p className="eyebrow">CV / Portfolio</p>
             <h1>{profile.heroTitle}</h1>
             <p className="lead">{profile.heroDescription}</p>
@@ -240,9 +214,9 @@ function HomePage({
             <p className="dataBadge">
               Veri kaynağı: {source === 'supabase' ? 'Supabase' : 'Yerel örnek veri'}
             </p>
-          </div>
+          </motion.div>
 
-          <div className="heroCard hero-enter hero-enter-3">
+          <motion.div className="heroCard" {...heroMotion} transition={{ ...heroMotion.transition, delay: 0.24 }}>
             <span className="badge">Açık Profil</span>
             <h2>Kısa Özet</h2>
             <p>{profile.summary}</p>
@@ -251,15 +225,15 @@ function HomePage({
               <li>Mobil uygulama denemeleri</li>
               <li>Ürün fikrini hızlı prototipleme</li>
             </ul>
-          </div>
+          </motion.div>
         </div>
-      </header>
+      </motion.header>
 
       <main>
-        <section
+        <motion.section
           id="about"
-          className="section twoColumn reveal reveal-delay-1 section-anchor"
-          data-reveal
+          className="section twoColumn section-anchor"
+          {...sectionMotion}
         >
           <div>
             <p className="sectionLabel">Hakkımda</p>
@@ -270,9 +244,9 @@ function HomePage({
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="section statsGrid reveal reveal-delay-2" data-reveal>
+        <motion.section className="section statsGrid" {...sectionMotion} transition={{ ...sectionMotion.transition, delay: 0.08 }}>
           <div className="statCard floatCard">
             <strong>{projects.length}+</strong>
             <span>Öne çıkarılmış proje</span>
@@ -289,12 +263,13 @@ function HomePage({
             <strong>Canlı</strong>
             <span>Kolayca güncellenebilir yapı</span>
           </div>
-        </section>
+        </motion.section>
 
-        <section
+        <motion.section
           id="projects"
-          className="section reveal reveal-delay-3 section-anchor"
-          data-reveal
+          className="section section-anchor"
+          {...sectionMotion}
+          transition={{ ...sectionMotion.transition, delay: 0.12 }}
         >
           <div className="sectionHeader">
             <div>
@@ -309,10 +284,12 @@ function HomePage({
 
           <div className="projectsGrid">
             {projects.map((project, index) => (
-              <article
-                className="projectCard reveal projectReveal"
-                data-reveal
-                style={{ animationDelay: `${0.15 * (index + 1)}s` }}
+              <motion.article
+                className="projectCard"
+                initial={{ opacity: 0, y: 36, scale: 0.985 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.18 }}
+                transition={{ duration: 0.75, delay: 0.1 * (index + 1), ease: [0.22, 1, 0.36, 1] }}
                 key={project.slug}
               >
                 <div className="projectTop">
@@ -338,15 +315,16 @@ function HomePage({
                 <Link className="detailLink" to={`/projects/${project.slug}`}>
                   Detay Sayfasına Git
                 </Link>
-              </article>
+              </motion.article>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section
+        <motion.section
           id="contact"
-          className="section contactSection reveal reveal-delay-4 section-anchor"
-          data-reveal
+          className="section contactSection section-anchor"
+          {...sectionMotion}
+          transition={{ ...sectionMotion.transition, delay: 0.16 }}
         >
           <div>
             <p className="sectionLabel">İletişim</p>
@@ -359,7 +337,7 @@ function HomePage({
             </p>
             <p className="contactMail">{profile.contactEmail}</p>
           </div>
-        </section>
+        </motion.section>
       </main>
     </div>
   )
